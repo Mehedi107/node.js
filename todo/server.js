@@ -3,9 +3,13 @@ const port = 5000;
 const host = 'localhost';
 
 const server = http.createServer((req, res) => {
-  console.log('>>>>>>req<<<<<<', req);
-  console.log('>>>>>>res<<<<<<', res);
-  res.end('Hello world!');
+  if (req.url === '/' && req.method === 'GET') {
+    res.end('Root route');
+  } else if (req.url === '/todos' && req.method === 'GET') {
+    res.end('All todos');
+  } else {
+    res.end('Route not found');
+  }
 });
 
 server.listen(port, host, () => {
