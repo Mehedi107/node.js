@@ -1,11 +1,16 @@
 const http = require('http');
 const fs = require('fs');
+const url = require('url');
+const { json } = require('stream/consumers');
 
 const port = 5000;
 const host = 'localhost';
 const filePath = `${__dirname}\\db\\todosData.json`;
 
 const server = http.createServer((req, res) => {
+  const parsedURL = url.parse(req.url, true);
+  const pathParts = parsedURL.pathname.split('/').filter(Boolean);
+
   // root route
   if (req.url === '/' && req.method === 'GET') {
     res.writeHead(200, {
@@ -47,6 +52,20 @@ const server = http.createServer((req, res) => {
       res.end(JSON.stringify(parsedData));
     });
 
+    return;
+  }
+
+  // get single todo
+  if (req.url.startsWith('/todo') && req.method === 'GET' && pathParts[1]) {
+    const id = +pathParts[1];
+    const todos = fs.readFileSync(filePath, { encoding: 'utf-8' });
+    const parsedTodos = JSON.parse(todos);
+
+    const todo = parsedTodos.find(todo => todo.id === id);
+    const stringifiedTodo = JSON.stringify(todo);
+
+    res.writeHead(201, { 'content-type': 'application/json' });
+    res.end(stringifiedTodo);
     return;
   }
 
