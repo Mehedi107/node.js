@@ -95,7 +95,24 @@ const server = http.createServer((req, res) => {
       res.end(JSON.stringify(parsedUpdatedData));
     });
 
-    // parsedTodos[todoIndex] =
+    return;
+  }
+
+  // delete todo by id
+  if (req.url.startsWith('/todo/delete') && req.method === 'DELETE') {
+    // get id
+    const id = +pathParts[2];
+    const todos = fs.readFileSync(filePath, { encoding: 'utf-8' });
+    const parsedTodos = JSON.parse(todos);
+
+    const filteredTodos = parsedTodos.filter(todo => todo.id !== id);
+    const stringifiedTodos = JSON.stringify(filteredTodos, null, 2);
+
+    fs.writeFileSync(filePath, stringifiedTodos);
+
+    // if all okay send response
+    res.writeHead(201, { 'Content-type': 'application/json' });
+    res.end(JSON.stringify({ success: 'true' }));
 
     return;
   }
