@@ -69,6 +69,37 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // update todo by id
+  if (req.url.startsWith('/todo/update') && req.method === 'PATCH') {
+    const id = +pathParts[2];
+
+    const todos = fs.readFileSync(filePath, { encoding: 'utf-8' });
+    const parsedTodos = JSON.parse(todos);
+
+    const todoIndex = parsedTodos.findIndex(todo => todo.id === id);
+
+    let data = '';
+
+    req.on('data', chunk => {
+      data += chunk;
+    });
+
+    req.on('end', () => {
+      const parsedUpdatedData = JSON.parse(data);
+
+      parsedTodos[todoIndex] = parsedUpdatedData;
+
+      fs.writeFileSync(filePath, JSON.stringify(parsedTodos, null, 2));
+
+      res.writeHead(201, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(parsedUpdatedData));
+    });
+
+    // parsedTodos[todoIndex] =
+
+    return;
+  }
+
   // if no route matched
   res.writeHead(404, { 'Content-Type': 'text/plain' });
   res.end('Route not found');
