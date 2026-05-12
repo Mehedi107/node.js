@@ -1,9 +1,10 @@
-const fs = require('node:fs');
+import { readFileSync, writeFileSync } from 'node:fs';
 
-const text = 'Hello Mehedi';
+const txt = "Learning node.js";
 
-fs.writeFileSync('./file.txt', text);
+writeFileSync("./fileSystem/sync/file.txt", txt, {encoding: "utf-8"})
 
-const data = fs.readFileSync('./file.txt', { encoding: 'utf-8' });
+const output = readFileSync("./fileSystem/sync/file.txt", {encoding: 'utf-8'})
 
-console.log(data);
+console.log(output);
+
