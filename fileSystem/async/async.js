@@ -1,21 +1,15 @@
-const fs = require('node:fs');
+import { readFile, writeFile } from 'node:fs/promises';
 
-console.log('Task 1...');
+const data = 'Hello Node.js';
 
-fs.writeFile('./asyncFile.txt', 'Overwritten file text', err => {
-  if (err) {
-    console.error('Task 2...', err);
-  } else {
-    console.log('Task 2...');
-  }
-});
+try {
+  await writeFile('./fileSystem/async/asyncFile.txt', data);
 
-fs.readFile('./asyncFile.txt', 'utf8', (err, data) => {
-  if (err) {
-    console.error('Error reading file:', err);
-    return;
-  }
-  console.log('Task 3...', data);
-});
+  console.log('The file has been saved!');
 
-console.log('Task 4...');
+  const contents = await readFile('./fileSystem/async/asyncFile.txt', {encoding: "utf-8"});
+
+  console.log(contents);
+} catch (err) {
+  console.error(err);
+}
