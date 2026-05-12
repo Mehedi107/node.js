@@ -1,27 +1,11 @@
-const fs = require('fs');
+import { createReadStream, createWriteStream } from "node:fs"
 
-const readStream = fs.createReadStream('./input.txt', 'utf-8');
-const writeStream = fs.createWriteStream('./output.txt', 'utf-8');
+const readStream = createReadStream('./fileSystem/stream/input.txt', 'utf-8')
 
-// readStream.pipe(writeStream);
+const writeStream = createWriteStream('./fileSystem/stream/output.txt')
 
-readStream.on('data', chunk => {
-  console.log(`Received chunk: ${chunk}`);
-  // Process the chunk here
-  writeStream.write(chunk, err => {
-    if (err) return console.log(`something went wrong ${err}`);
-  });
-});
+readStream.pipe(writeStream)
 
-readStream.on('end', () => {
-  console.log('Finished reading the file.');
-  writeStream.end();
-});
-
-readStream.on('error', err => {
-  console.error(`>>>>>Error reading file: ${err}`);
-});
-
-writeStream.on('finish', () => {
-  console.log('Write complete.');
-});
+writeStream.on("finish", () => {
+  console.log("File copied successfully!");
+})
