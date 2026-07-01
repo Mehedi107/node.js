@@ -1,5 +1,11 @@
 import http from 'http';
 
+const data = {
+  id: 1,
+  title: "First title",
+  description: "lorem330dsgeetgfewgrtgesefsdfsdfgd"
+}
+
 const PORT = 5000;
 
 const server = http.createServer((req, res) => {
@@ -7,7 +13,16 @@ const server = http.createServer((req, res) => {
   // res.end("Hello from Node.js server");
 
   if(req.url === '/todos' && req.method === 'GET') {
-    res.end("All todos here...");
+    // res.statusCode = 200;
+    // res.setHeader("content-type", "plain/text");
+    // res.setHeader("email", "mh@gmail.com");
+
+    res.writeHead(200, {
+      "content-type" : "application/json",
+      "email" : "mehedi@gmail.com"
+    })
+
+    res.end(JSON.stringify(data));
   } else if(req.url === '/todos/create-todo' && req.method === 'POST') {
     res.end("Todo created");
   }else {
