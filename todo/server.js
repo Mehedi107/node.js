@@ -73,8 +73,94 @@ const server = http.createServer(async (req, res) => {
       });
 
       res.end(JSON.stringify(todo));
-  } else {
-    res.end("Route not found")
+    // ✅ update todo
+  } else if (req.url.startsWith("/todos") && req.method === "PUT") {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const id = Number(url.searchParams.get("id"));
+
+      let body = "";
+
+      req.on("data", chunk => {
+        body += chunk;
+      });
+
+      req.on("end", async () => {
+
+        const todos = JSON.parse(
+          await readFile("./db/todosData.json", "utf-8")
+        );
+
+        const updatedTodo = JSON.parse(body);
+
+        const index = todos.findIndex(todo => todo.id === id);
+
+        if (index === -1) {
+          res.writeHead(404, {
+            "Content-Type": "application/json"
+          });
+
+          return res.end(JSON.stringify({
+            message: "Todo not found"
+          }));
+        }
+
+        todos[index] = {
+          ...todos[index],
+          ...updatedTodo
+        };
+
+        await writeFile(
+          "./db/todosData.json",
+          JSON.stringify(todos, null, 2)
+        );
+
+        res.writeHead(200, {
+          "Content-Type": "application/json"
+        });
+
+        res.end(JSON.stringify(todos[index]));
+
+      });
+    // ✅ delete todo
+  } else if (req.url.startsWith("/todos") && req.method === "DELETE") {
+
+      const url = new URL(req.url, `http://${req.headers.host}`);
+
+      const id = Number(url.searchParams.get("id"));
+
+      const todos = JSON.parse(
+        await readFile("./db/todosData.json", "utf-8")
+      );
+
+      const filteredTodos = todos.filter(todo => todo.id !== id);
+
+      if (filteredTodos.length === todos.length) {
+
+        res.writeHead(404, {
+          "Content-Type": "application/json"
+        });
+
+        return res.end(JSON.stringify({
+          message: "Todo not found"
+        }));
+      }
+
+      await writeFile(
+        "./db/todosData.json",
+        JSON.stringify(filteredTodos, null, 2)
+      );
+
+      res.writeHead(200, {
+        "Content-Type": "application/json"
+      });
+
+      res.end(JSON.stringify({
+        message: "Todo deleted"
+      }));
+
+    } 
+  else {
+      res.end("Route not found")
   }
 });
 
