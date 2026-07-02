@@ -1,11 +1,12 @@
 import { readFile, writeFile } from 'fs/promises';
 import http from 'http';
+import { URL } from 'url';
 
 const allTodo = await readFile("./db/todosData.json", "utf-8");
 
 const PORT = 5000;
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   // console.log("Request URL is: ", req.url, "Request method is: ",req.method);
   // res.end("Hello from Node.js server");
 
@@ -47,8 +48,32 @@ const server = http.createServer((req, res) => {
 
       res.end(body);
     })
-    
-  }else {
+    // ✅ Get a single todo
+  } else if(req.url.startsWith('/todo') && req.method === 'GET') {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+
+      const id = Number(url.searchParams.get("id"));
+
+      const todos = JSON.parse(await readFile("./db/todosData.json", "utf-8"));
+
+      const todo = todos.find((t) => t.id === id);
+
+      if (!todo) {
+        res.writeHead(404, {
+          "Content-Type": "application/json",
+        });
+
+        return res.end(JSON.stringify({
+          message: "Todo not found",
+        }));
+      }
+
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+      });
+
+      res.end(JSON.stringify(todo));
+  } else {
     res.end("Route not found")
   }
 });
